@@ -1,0 +1,7 @@
+# requirements.txt
+Flask
+stripe
+gspread
+oauth2client
+python-dotenv
+Flask-Cors

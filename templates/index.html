@@ -1,0 +1,75 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unix Training Academy - Pay What You Want</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin: 40px; background: #f7f7f7; }
+    .container { background: white; padding: 20px; border-radius: 8px; max-width: 500px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    .slider { width: 100%; margin: 20px 0; }
+    input[type="submit"] { padding: 10px 20px; font-size: 16px; border: none; background: #e63946; color: white; border-radius: 5px; cursor: pointer; }
+    input[type="submit"]:hover { background: #d62828; }
+    input, output { width: 100%; padding: 10px; margin-top: 10px; font-size: 14px; }
+    .radio-group { text-align: left; margin-top: 10px; }
+    .divider { border-top: 4px solid #333; margin: 30px 0; }
+    .countdown { font-size: 16px; font-weight: bold; color: #d62828; margin-bottom: 10px; }
+    .limited-space { color: #e63946; font-weight: bold; margin-top: 10px; }
+    .only-20 { color: #e63946; font-weight: bold; font-size: 16px; margin-top: 5px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="countdown" id="countdown"></div>
+    <h1>Join Unix Training Academy's May Training</h1>
+
+    <form action="/form" method="POST">
+      <div class="radio-group">
+        <label><strong>Choose Your Payment Option:</strong></label><br>
+        <input type="radio" name="payment_option" value="full"> Pay in Full – $3,500
+        <div class="divider"></div>
+        <label><strong>Or make us an offer:</strong></label><br>
+        <input type="radio" name="payment_option" value="installments" checked> Draw the slider and Make us an Offer
+      </div>
+
+      <label for="price">Pay What You Want ($999 - $3,500):</label><br>
+      <input type="range" name="price" id="price" min="999" max="3500" value="999" class="slider" oninput="priceDisplay.value = price.value">
+      <br>
+      <output id="priceDisplay">999</output> USD
+
+      <p class="limited-space">Limited Spaces Available</p>
+      <p class="only-20">20 Seats Only Available</p>
+      <p class="limited-space">You will know if your offer is accepted on the next page.</p>
+
+      <input type="text" name="name" placeholder="Your Full Name" required><br>
+      <input type="email" name="email" placeholder="Your Email" required><br>
+      <input type="text" name="experience" placeholder="Your Linux/DevOps Experience Level">
+      <br>
+      <input type="submit" value="Continue">
+    </form>
+  </div>
+
+  <script>
+    // Countdown timer for 14 days
+    const countdownElement = document.getElementById("countdown");
+    const endDate = new Date();
+    endDate.setDate(endDate.getDate() + 14);
+
+    const updateCountdown = () => {
+      const now = new Date();
+      const diff = endDate - now;
+      if (diff <= 0) {
+        countdownElement.innerText = "Offer expired.";
+        return;
+      }
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      countdownElement.innerText = `⏳ ${days} days ${hours}h ${minutes}m left to enroll!`;
+    };
+    setInterval(updateCountdown, 60000);
+    updateCountdown();
+  </script>
+</body>
+</html>

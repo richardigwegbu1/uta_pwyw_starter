@@ -1,0 +1,73 @@
+uta_pwyw_starter full deployment plan broken down step-by-step.
+
+☁️ Phase 1: Infrastructure (Highly Available AWS Setup)
+
+Create a Launch Template (RHEL-based)
+
+Amazon EC2 → Launch Template
+
+Base it on your current tested EC2 instance
+
+Include user-data bootstrap script to install Python, dependencies, pull from GitHub
+
+Set up an Auto Scaling Group
+
+Use your Launch Template
+
+Min: 2 instances, Max: 4 (adjust as needed)
+
+Attach to target group (next step)
+
+Create an Application Load Balancer
+
+Use public subnets in at least 2 AZs
+
+Target group: instance mode → points to your auto scaling group
+
+Health check path: / (Flask home)
+
+Set up Security Groups
+
+ALB: open ports 80 and 443
+
+EC2: allow from ALB only
+
+☁️ Phase 2: CI/CD (GitHub Actions + Auto Deployment)
+
+Prepare your GitHub repo
+
+Your PWYW app code should be pushed to a GitHub repo (we’ll set this up for deployments)
+
+Write GitHub Actions Workflow
+
+Workflow will SSH into EC2 (or deploy to S3/CodeDeploy) after every push to main branch
+
+Use secrets for SSH key, EC2 IP/hostname
+
+(Optional) Use AWS CodeDeploy or Elastic Beanstalk if you want managed deployments
+
+🌐 Phase 3: Domain + HTTPS
+
+Route53 + Subdomain Setup
+
+Go to Route53 → create a record like register.unixtrainingacademy.com
+
+Point to your ALB DNS name using an A record (Alias)
+
+HTTPS Setup with ACM + ALB
+
+Request a public certificate for register.unixtrainingacademy.com
+
+Attach the certificate to your Load Balancer → HTTPS Listener
+
+🔍 Bonus: SEO-Friendly Name Ideas Instead of register.unixtrainingacademy.com, here are ideas:
+
+enroll.unixtrainingacademy.com ✅ (simple)
+
+training.unixtrainingacademy.com
+
+offer.unixtrainingacademy.com (great for PWYW)
+
+start.unixtrainingacademy.com
+
+join.unixtrainingacademy.com
