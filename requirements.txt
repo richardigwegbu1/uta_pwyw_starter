@@ -5,3 +5,4 @@ gspread
 oauth2client
 python-dotenv
 Flask-Cors
+Flask-Mail
