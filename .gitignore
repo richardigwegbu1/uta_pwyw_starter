@@ -3,3 +3,8 @@ credentials.json
 venv/
 __pycache__/
 *.pyc
+*.bak
+*.backup
+venv_old/
+start_gunicorn.sh
+
