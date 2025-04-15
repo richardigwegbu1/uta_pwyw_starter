@@ -1,64 +1,47 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Congratulations - Unix Training Academy</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background-color: #f8f9fa;
-      padding: 40px;
-    }
-    .container {
-      background: #fff;
-      max-width: 600px;
-      margin: auto;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-    }
-    img {
-      width: 150px;
-      margin-bottom: 20px;
-    }
-    h1 {
-      color: #2d2d2d;
-      font-size: 28px;
-    }
-    p {
-      font-size: 16px;
-      color: #555;
-      margin-bottom: 30px;
-    }
-    .seat-number {
-      font-size: 18px;
-      font-weight: bold;
-      color: #d62828;
-      margin-bottom: 25px;
-    }
-    a.button {
-      display: inline-block;
-      padding: 12px 25px;
-      background-color: #e63946;
-      color: #fff;
-      text-decoration: none;
-      font-size: 16px;
-      border-radius: 5px;
-    }
-    a.button:hover {
-      background-color: #d62828;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Congratulations</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            text-align: center;
+            padding: 40px;
+        }
+        .card {
+            background: white;
+            padding: 30px;
+            max-width: 600px;
+            margin: auto;
+            border-radius: 10px;
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            background: #ff0000;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #cc0000;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <img src="{{ url_for('static', filename='UTA-Log.jpg') }}" alt="UTA Logo">
-    <h1>🎉 Congratulations!</h1>
-    <p>You have been selected to join the Unix Training Academy’s May Training session.</p>
-    <p class="seat-number">You are number {{ seat_number }} out of 20.</p>
-    <a class="button" href="/continue-checkout">Continue to Checkout</a>
-  </div>
+    <div class="card">
+        <h1>🎉 Congratulations!</h1>
+        <p>You have secured <strong>Seat #{{ seat_number }}</strong>.</p>
+        <form action="/continue-checkout" method="post">
+            <input type="hidden" name="token" value="{{ token }}">
+            <button type="submit">Continue to Checkout</button>
+        </form>
+    </div>
 </body>
 </html>
+

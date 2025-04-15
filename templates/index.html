@@ -1,75 +1,115 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Unix Training Academy - Pay What You Want</title>
-  <style>
-    body { font-family: Arial, sans-serif; text-align: center; margin: 40px; background: #f7f7f7; }
-    .container { background: white; padding: 20px; border-radius: 8px; max-width: 500px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    .slider { width: 100%; margin: 20px 0; }
-    input[type="submit"] { padding: 10px 20px; font-size: 16px; border: none; background: #e63946; color: white; border-radius: 5px; cursor: pointer; }
-    input[type="submit"]:hover { background: #d62828; }
-    input, output { width: 100%; padding: 10px; margin-top: 10px; font-size: 14px; }
-    .radio-group { text-align: left; margin-top: 10px; }
-    .divider { border-top: 4px solid #333; margin: 30px 0; }
-    .countdown { font-size: 16px; font-weight: bold; color: #d62828; margin-bottom: 10px; }
-    .limited-space { color: #e63946; font-weight: bold; margin-top: 10px; }
-    .only-20 { color: #e63946; font-weight: bold; font-size: 16px; margin-top: 5px; }
-  </style>
+    <meta charset="UTF-8">
+    <title>Unix Training Academy – May 2025 Enrollment</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 40px;
+            text-align: center;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            max-width: 600px;
+            margin: auto;
+            border-radius: 10px;
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+        }
+        label, select, input {
+            display: block;
+            margin: 15px auto;
+            width: 90%;
+            font-size: 16px;
+            padding: 8px;
+        }
+        .slider-box {
+            display: none;
+            margin-top: 20px;
+            background: #fff7f7;
+            padding: 15px;
+            border: 1px solid #ffcccc;
+            border-radius: 5px;
+        }
+        .notice {
+            color: #c40000;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .price-display {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <div class="countdown" id="countdown"></div>
-    <h1>Join Unix Training Academy's May Training</h1>
+    <div class="container">
+        <h2>🎓 Unix Training Academy – May 2025 Enrollment</h2>
+        <form action="/form" method="post">
+            <label>Full Name:</label>
+            <input type="text" name="name" required>
 
-    <form action="/continue-checkout" method="POST">
-      <div class="radio-group">
-        <label><strong>Choose Your Payment Option:</strong></label><br>
-        <input type="radio" name="payment_option" value="full"> Pay in Full – $3,500
-        <div class="divider"></div>
-        <label><strong>Or make us an offer:</strong></label><br>
-        <input type="radio" name="payment_option" value="installments" checked> Draw the slider and Make us an Offer
-      </div>
+            <label>Email Address:</label>
+            <input type="email" name="email" required>
 
-      <label for="price">Pay What You Want ($999 - $3,500):</label><br>
-      <input type="range" name="price" id="price" min="999" max="3500" value="999" class="slider" oninput="priceDisplay.value = price.value">
-      <br>
-      <output id="priceDisplay">999</output> USD
+            <label>Your Experience Level:</label>
+            <select name="experience">
+                <option>Beginner</option>
+                <option>Intermediate</option>
+                <option>Advanced</option>
+            </select>
 
-      <p class="limited-space">Limited Spaces Available</p>
-      <p class="only-20">20 Seats Only Available</p>
-      <p class="limited-space">You will know if your offer is accepted on the next page.</p>
+            <label>Choose Payment Option:</label>
+            <select name="payment_option" id="payment_option" onchange="toggleSlider(this.value)">
+                <option value="full">Pay in Full ($3500)</option>
+                <option value="installments">Make Us an Offer</option>
+            </select>
 
-      <input type="text" name="name" placeholder="Your Full Name" required><br>
-      <input type="email" name="email" placeholder="Your Email" required><br>
-      <input type="text" name="experience" placeholder="Your Linux/DevOps Experience Level">
-      <br>
-      <input type="submit" value="Continue">
-    </form>
-  </div>
+            <div id="slider-box" class="slider-box">
+                <p class="notice">
+                    🚨 <strong>There are Limited Spaces Available When you Make an Offer</strong><br>
+                    So make a reasonable offer to be accepted. <br>
+                    <em>You will know if we accept your offer on the next page. Good luck!</em>
+                </p>
 
-  <script>
-    // Countdown timer for 14 days
-    const countdownElement = document.getElementById("countdown");
-    const endDate = new Date();
-    endDate.setDate(endDate.getDate() + 14);
+                <label>Offer Amount:</label>
+                <input type="range" name="price" id="price" min="999" max="3500" step="50" value="2500" oninput="updatePriceDisplay(this.value)">
+                <p class="price-display">Your Offer: <span id="price-display">$2500</span></p>
+            </div>
 
-    const updateCountdown = () => {
-      const now = new Date();
-      const diff = endDate - now;
-      if (diff <= 0) {
-        countdownElement.innerText = "Offer expired.";
-        return;
-      }
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((diff / (1000 * 60)) % 60);
-      countdownElement.innerText = `⏳ ${days} days ${hours}h ${minutes}m left to enroll!`;
-    };
-    setInterval(updateCountdown, 60000);
-    updateCountdown();
-  </script>
+            <button type="submit">Submit and Continue</button>
+        </form>
+    </div>
+
+    <script>
+        function toggleSlider(value) {
+            const slider = document.getElementById('slider-box');
+            if (value === 'installments') {
+                slider.style.display = 'block';
+            } else {
+                slider.style.display = 'none';
+            }
+        }
+
+        function updatePriceDisplay(value) {
+            document.getElementById('price-display').textContent = `$${value}`;
+        }
+    </script>
 </body>
 </html>
+
