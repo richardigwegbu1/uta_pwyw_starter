@@ -1,0 +1,32 @@
+Unix Training Academy – May 2025 Enrollment
+🎯 Project Milestone Summary
+
+This document summarizes the successful milestone achieved in deploying the Unix Training Academy "Pay What You Want" Enrollment Application for May 2025. After a long debugging session, the app is now able to:
+
+1. Display a modern enrollment form with a working slider for "Make an Offer" payments.
+2. Redirect to a dynamic congratulatory page upon form submission.
+3. Continue to Stripe Checkout for both full and installment payments.
+4. Handle Stripe Webhook events and update Google Sheets accordingly.
+5. Show a clear and branded success page after payment.
+6. Support server-side sessions using Flask-Session.
+
+✅ Current Working Features
+
+- Real-time offer slider with visual feedback
+- "Limited Seats Available" notice for offers
+- Accurate seat number generation
+- Stripe Checkout Integration (full & installment)
+- Google Sheets logging of enrollment data
+- Branded confirmation and success pages
+
+🧩 Remaining Enhancements
+
+- SMTP email confirmation fix
+- Gunicorn/HTTPD production setup
+- Session handling improvements with Gunicorn
+- Error page styling (optional)
+- Add analytics and campaign tracking for marketing
+
+🧾 Test IP/URL
+http://44.195.140.180:8000
+
