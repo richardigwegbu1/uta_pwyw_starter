@@ -166,5 +166,20 @@ def stripe_webhook():
 
     return '', 200
 
+@app.route("/test-email")
+def test_email():
+    try:
+        msg = Message(
+            subject="✅ Test Email from Unix Training Academy",
+            sender=app.config['MAIL_USERNAME'],
+            recipients=[app.config['MAIL_USERNAME']],  # send to yourself
+            body="This is a test email from your Flask app using HostGator SMTP."
+        )
+        mail.send(msg)
+        return "✅ Test email sent successfully!"
+    except Exception as e:
+        return f"❌ Failed to send email: {e}"
+
+
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0", port=8000)
