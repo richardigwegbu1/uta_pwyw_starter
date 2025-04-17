@@ -3,6 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <title>Payment Successful</title>
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-BSPTMXT5P9"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-BSPTMXT5P9');
+
+      // Custom conversion event
+      gtag('event', 'conversion', {
+        'send_to': 'G-BSPTMXT5P9',
+        'event_category': 'Enrollment',
+        'event_label': 'Successful Payment'
+      });
+    </script>
+    <!-- End Google Analytics -->
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -40,3 +59,4 @@
     </div>
 </body>
 </html>
+
