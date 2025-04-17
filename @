@@ -75,6 +75,7 @@ def send_enrollment_email(student_name, email, amount, receipt_url):
 
 
 
+
 @app.route("/", methods=["GET"])
 def home():
     return render_template("index.html")
@@ -156,32 +157,47 @@ def success():
 
     return render_template("success.html", student_name=student.get("name", "Student"), amount_paid=amount_paid)
 
-
 @app.route("/webhook", methods=["POST"])
 def stripe_webhook():
     payload = request.data
     sig_header = request.headers.get("stripe-signature")
     endpoint_secret = os.getenv("STRIPE_WEBHOOK_SECRET")
+
     try:
         event = stripe.Webhook.construct_event(payload, sig_header, endpoint_secret)
+        print("✅ Stripe webhook received:", event['type'])
     except stripe.error.SignatureVerificationError:
-        print("❌ Invalid signature in webhook")
+        print("❌ Invalid webhook signature")
         return "Invalid signature", 400
 
+    # Only process successful checkout events
     if event['type'] == 'checkout.session.completed':
-        print("✅ Stripe checkout.session.completed received")
-        session = event['data']['object']
-        email = session.get("customer_email")
-        receipt_url = session.get("receipt_url", "")
-        payment_option = session.get("metadata", {}).get("payment_option")
-        full_price = float(session.get("metadata", {}).get("full_price", 0))
+        session_data = event['data']['object']
 
-        print(f"📧 Sending email to: {email}")
-        cell = sheet.find(email)
-        if cell:
-            sheet.update_cell(cell.row, 6, "Paid")
-            student = sheet.row_values(cell.row)
-            send_enrollment_email(student[0], email, full_price, receipt_url)
+        email = session_data.get("customer_email")
+        receipt_url = session_data.get("receipt_url", "")
+        metadata = session_data.get("metadata", {})
+        payment_option = metadata.get("payment_option")
+        full_price = float(metadata.get("full_price", 0))
+
+        print("📧 Customer email:", email)
+        print("📦 Metadata:", metadata)
+        print("🧾 Receipt URL:", receipt_url)
+        print("💰 Full price:", full_price)
+
+        try:
+            cell = sheet.find(email)
+            if cell:
+                print(f"📄 Found email in sheet at row {cell.row}")
+                sheet.update_cell(cell.row, 6, "Paid")
+                student = sheet.row_values(cell.row)
+                student_name = student[0]
+                print(f"✅ Sending email to {email} for {student_name}")
+                send_enrollment_email(student_name, email, full_price, receipt_url)
+            else:
+                print("❌ Email not found in sheet")
+        except Exception as e:
+            print("❌ Error updating sheet or sending email:", str(e))
 
     return '', 200
 
