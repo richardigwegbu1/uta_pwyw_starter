@@ -10,3 +10,4 @@ start_gunicorn.sh
 
 .flask_session/
 flask_session/
+.session/
