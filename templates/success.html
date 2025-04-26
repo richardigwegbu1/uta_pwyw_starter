@@ -51,11 +51,10 @@
 </head>
 <body>
     <div class="card">
-        <h1 class="emoji">✅ Payment Successful!</h1>
-        <p>Thank you <strong>{{ student_name }}</strong> for enrolling in our program.</p>
-        <p>You have successfully paid <strong>${{ "{:,.2f}".format(amount_paid) }}</strong>.</p>
-        <p>📩 A confirmation email has been sent to you.<br>
-        You will also receive the full course access details shortly.</p>
+    <h1>✅ Payment Successful!</h1>
+    <p>Thank you <strong>{{ student_name }}</strong> for enrolling in our program.</p>
+    <p>{{ message }}</p>
+    <p>📩 A confirmation email has been sent to you.<br>You will also receive the full course access details shortly.</p>
     </div>
 </body>
 </html>

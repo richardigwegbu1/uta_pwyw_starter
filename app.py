@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, render_template, session as flask_session, render_template_string
+from flask import Flask, render_template, request, redirect, url_for, session, render_template_string
 import stripe
 import os
 import gspread
@@ -42,7 +42,6 @@ app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS') == 'True'
 app.config['MAIL_USE_SSL'] = os.getenv('MAIL_USE_SSL') == 'True'
-
 mail = Mail(app)
 
 def send_enrollment_email(student_name, email, amount, receipt_url):
@@ -86,75 +85,92 @@ def handle_form():
     experience = request.form.get("experience")
     payment_option = request.form.get("payment_option")
     price = 3500.00 if payment_option == "full" else float(request.form.get("price", 0))
-
     seat_number = random.randint(1, 20)
-    flask_session["student"] = {
+
+    session["student"] = {
         "name": name, "email": email, "experience": experience,
-        "price": price, "payment_option": payment_option
+        "price": price, "payment_option": payment_option,
+        "seat_number": seat_number
     }
-    flask_session["seat_number"] = seat_number
 
-    # Append to Google Sheet
     sheet.append_row([name, email, experience, price, payment_option, "Pending"])
-
     return redirect("/congratulations")
 
 @app.route("/congratulations", methods=["GET", "POST"])
 def congratulations():
-    return render_template("congratulations.html", seat_number=flask_session.get("seat_number"))
+    return render_template("congratulations.html", seat_number=session.get("student", {}).get("seat_number"))
+
 
 @app.route("/continue-checkout", methods=["POST"])
 def continue_checkout():
-    data = flask_session.get('student')
+    data = session.get('student')
     if not data:
         return "Session expired. Please refill the form.", 400
 
     price = float(data["price"])
     email = data["email"]
+    name = data["name"]
     payment_option = data["payment_option"]
 
     if payment_option == "installments":
+        amount = round(price / 2, 2)
         product = stripe.Product.create(name="UTA May Installments")
         stripe_price = stripe.Price.create(
-            unit_amount=int((price / 2) * 100),
+            unit_amount=int(amount * 100),
             currency="usd",
             recurring={"interval": "month"},
             product=product.id,
         )
-        session = stripe.checkout.Session.create(
+        stripe_session = stripe.checkout.Session.create(
             mode="subscription",
             line_items=[{"price": stripe_price.id, "quantity": 1}],
             customer_email=email,
-            success_url=f"{YOUR_DOMAIN}/success",
-            cancel_url=f"{YOUR_DOMAIN}/cancel.html"
+            success_url=f"http://44.195.140.180/success",
+            cancel_url=f"http://44.195.140.180/cancel.html"
         )
     else:
-        session = stripe.checkout.Session.create(
+        amount = price
+        stripe_session = stripe.checkout.Session.create(
             payment_method_types=["card"],
             line_items=[{
                 "price_data": {
                     "currency": "usd",
                     "product_data": {"name": "UTA May Full Payment"},
-                    "unit_amount": int(price * 100),
+                    "unit_amount": int(amount * 100),
                 },
                 "quantity": 1,
             }],
             mode="payment",
             customer_email=email,
-            success_url=f"{YOUR_DOMAIN}/success",
-            cancel_url=f"{YOUR_DOMAIN}/cancel.html"
+            success_url=f"http://44.195.140.180/success",
+            cancel_url=f"http://44.195.140.180/cancel.html"
         )
-    return redirect(session.url, code=303)
+
+    # ✅ Save data into session
+    session["amount_paid"] = amount
+    session["student_name"] = name
+
+    return redirect(stripe_session.url, code=303)
+
 
 @app.route("/success")
 def success():
-    student = flask_session.get("student", {})
-    amount_paid = float(student.get("price", 0))
+    student_name = session.get("student_name", "Student")
+    amount_paid = session.get("amount_paid")
+    payment_option = session.get("student", {}).get("payment_option", "full")
 
-    if student.get("payment_option") == "installments":
-        amount_paid = amount_paid / 2
+    try:
+        formatted_amount = "${:,.2f}".format(float(amount_paid))
+    except (ValueError, TypeError):
+        formatted_amount = "$0.00"
 
-    return render_template("success.html", student_name=student.get("name", "Student"), amount_paid=amount_paid)
+    if payment_option == "installments":
+        message = f"You’ve successfully paid {formatted_amount}. The remaining balance will be automatically charged in 30 days."
+    else:
+        message = f"You’ve successfully paid {formatted_amount}."
+
+    return render_template("success.html", student_name=student_name, message=message)
+
 
 
 @app.route("/webhook", methods=["POST"])
@@ -162,6 +178,7 @@ def stripe_webhook():
     payload = request.data
     sig_header = request.headers.get("stripe-signature")
     endpoint_secret = os.getenv("STRIPE_WEBHOOK_SECRET")
+
     try:
         event = stripe.Webhook.construct_event(payload, sig_header, endpoint_secret)
     except stripe.error.SignatureVerificationError:
@@ -170,11 +187,11 @@ def stripe_webhook():
 
     if event['type'] == 'checkout.session.completed':
         print("✅ Stripe checkout.session.completed received")
-        session = event['data']['object']
-        email = session.get("customer_email")
-        receipt_url = session.get("receipt_url", "")
-        payment_option = session.get("metadata", {}).get("payment_option")
-        full_price = float(session.get("metadata", {}).get("full_price", 0))
+        stripe_session = event['data']['object']
+        email = stripe_session.get("customer_email")
+        receipt_url = stripe_session.get("receipt_url", "")
+        payment_option = stripe_session.get("metadata", {}).get("payment_option")
+        full_price = float(stripe_session.get("metadata", {}).get("full_price", 0))
 
         print(f"📧 Sending email to: {email}")
         cell = sheet.find(email)
@@ -205,3 +222,4 @@ def test_email():
 
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0", port=8000)
+
