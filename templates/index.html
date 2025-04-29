@@ -2,21 +2,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <title>Unix Training Academy – May 31st, 2025 Session</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unix Training Academy – May 2025 Session</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             background: #f5f5f5;
             padding: 20px;
-            margin: 0;
             text-align: center;
         }
         .container {
             background: white;
             padding: 30px;
             max-width: 600px;
-            margin: 20px auto;
+            margin: auto;
             border-radius: 10px;
             box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
         }
@@ -24,24 +23,21 @@
             width: 150px;
             margin-bottom: 20px;
         }
-        .session-info {
-            font-size: 16px;
-            margin-bottom: 15px;
+        .date-line, .duration-line {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 10px 0;
+            flex-wrap: wrap;
         }
-        .session-info strong {
-            display: block;
-            margin-bottom: 8px;
-        }
-        .enroll-btn {
+        .duration-line button {
             background: black;
             color: red;
+            padding: 6px 16px;
             border: none;
-            padding: 10px 20px;
             border-radius: 6px;
-            font-size: 16px;
-            margin-bottom: 20px;
-            text-decoration: none;
-            display: inline-block;
+            font-size: 14px;
+            cursor: pointer;
         }
         label, select, input {
             display: block;
@@ -50,11 +46,8 @@
             font-size: 16px;
             padding: 8px;
         }
-        .label-red {
-            color: red;
-            font-weight: bold;
-        }
         .slider-box {
+            display: none;
             margin-top: 20px;
             background: #fff7f7;
             padding: 15px;
@@ -71,7 +64,12 @@
             margin-top: 10px;
             font-weight: bold;
         }
-        button {
+        .red-label {
+            color: red;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        button.submit-btn {
             background: black;
             color: red;
             border: none;
@@ -79,10 +77,15 @@
             border-radius: 6px;
             font-size: 16px;
             cursor: pointer;
+            margin-top: 20px;
         }
-        button:hover {
-            background: red;
-            color: white;
+        button.submit-btn:hover {
+            background: #333;
+        }
+        @media (max-width: 600px) {
+            .date-line, .duration-line {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -90,31 +93,42 @@
     <div class="container">
         <img src="{{ url_for('static', filename='UTA-Log.png') }}" alt="Unix Training Academy Logo" class="uta-logo">
         <h2>🎓 Unix Training Academy – May 2025 Session</h2>
-        <div class="session-info">
-            <p><strong>Start Date:</strong> May 31st, 2025 | <strong>End Date:</strong> November 30th, 2025</p>
-            <p><strong>Duration:</strong> 26 Weeks | <a href="#" class="enroll-btn">Enroll Now</a></p>
+
+        <div class="date-line">
+            <strong>Start Date:</strong> May 31st, 2025 |
+            <strong>End Date:</strong> November 30th, 2025
+        </div>
+
+        <div class="duration-line">
+            <strong>Duration:</strong> 26 Weeks |
+            <button>Enroll Now</button>
         </div>
 
         <form action="/form" method="post">
-            <label class="label-red">Choose Payment Option:</label>
+            <label>Full Name:</label>
+            <input type="text" name="name" required>
+
+            <label>Email Address:</label>
+            <input type="email" name="email" required>
+
+            <div class="red-label">Choose Payment Option:</div>
             <select name="payment_option" id="payment_option" onchange="toggleSlider(this.value)">
                 <option value="full">Pay in Full ($3500)</option>
                 <option value="installments">Make Us an Offer</option>
             </select>
 
-            <div id="slider-box" class="slider-box" style="display:none">
+            <div id="slider-box" class="slider-box">
                 <p class="notice">
-                    🚨 <strong>Limited Spaces Available (Only 20 Seats)</strong><br>
+                    🚨 <strong>There are Limited Spaces Available (Only 20 Seats)!</strong><br>
                     Make a reasonable offer to secure your seat.<br>
                     <em>You will know if your offer is accepted on the next page.</em>
                 </p>
-
                 <label>Offer Amount:</label>
                 <input type="range" name="price" id="price" min="999" max="3500" step="50" value="2500" oninput="updatePriceDisplay(this.value)">
                 <p class="price-display">Your Offer: <span id="price-display">$2500</span></p>
             </div>
 
-            <button type="submit">Submit and Continue</button>
+            <button type="submit" class="submit-btn">Submit and Continue</button>
         </form>
     </div>
 
@@ -134,3 +148,4 @@
     </script>
 </body>
 </html>
+
