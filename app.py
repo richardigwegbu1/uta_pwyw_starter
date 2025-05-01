@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from flask_session import Session
 import uuid
 import random
+import certifi  # ✅ Fix Stripe TLS issue
 
 # Load environment variables
 load_dotenv()
@@ -27,6 +28,8 @@ Session(app)
 
 # Stripe Setup
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
+stripe.verify_ssl_certs = True
+stripe.default_ca_bundle_path = certifi.where()
 YOUR_DOMAIN = os.getenv("YOUR_DOMAIN")
 
 # Google Sheets Setup
@@ -72,8 +75,6 @@ def send_enrollment_email(student_name, email, amount, receipt_url):
         print("❌ Email failed:", e)
 
 
-
-
 @app.route("/", methods=["GET"])
 def home():
     return render_template("index.html")
@@ -82,24 +83,29 @@ def home():
 def handle_form():
     name = request.form.get("name")
     email = request.form.get("email")
-    experience = request.form.get("experience")
+    phone = request.form.get("phone")
+    experience = request.form.get("experience")  # still captured for session
     payment_option = request.form.get("payment_option")
     price = 3500.00 if payment_option == "full" else float(request.form.get("price", 0))
     seat_number = random.randint(1, 20)
 
     session["student"] = {
-        "name": name, "email": email, "experience": experience,
-        "price": price, "payment_option": payment_option,
+        "name": name,
+        "email": email,
+        "phone": phone,
+        "experience": experience,
+        "price": price,
+        "payment_option": payment_option,
         "seat_number": seat_number
     }
 
-    sheet.append_row([name, email, experience, price, payment_option, "Pending"])
+    # Append to Google Sheet (excluding experience)
+    sheet.append_row([name, email, phone, price, payment_option, "Pending"])
     return redirect("/congratulations")
 
 @app.route("/congratulations", methods=["GET", "POST"])
 def congratulations():
     return render_template("congratulations.html", seat_number=session.get("student", {}).get("seat_number"))
-
 
 @app.route("/continue-checkout", methods=["POST"])
 def continue_checkout():
@@ -146,12 +152,10 @@ def continue_checkout():
             cancel_url=f"http://44.195.140.180/cancel.html"
         )
 
-    # ✅ Save data into session
     session["amount_paid"] = amount
     session["student_name"] = name
 
     return redirect(stripe_session.url, code=303)
-
 
 @app.route("/success")
 def success():
@@ -170,8 +174,6 @@ def success():
         message = f"You’ve successfully paid {formatted_amount}."
 
     return render_template("success.html", student_name=student_name, message=message)
-
-
 
 @app.route("/webhook", methods=["POST"])
 def stripe_webhook():
@@ -202,23 +204,19 @@ def stripe_webhook():
 
     return '', 200
 
-
-
-
 @app.route("/test-email")
 def test_email():
     try:
         msg = Message(
             subject="✅ Test Email from Unix Training Academy",
             sender=app.config['MAIL_USERNAME'],
-            recipients=[app.config['MAIL_USERNAME']],  # send to yourself
+            recipients=[app.config['MAIL_USERNAME']],
             body="This is a test email from your Flask app using HostGator SMTP."
         )
         mail.send(msg)
         return "✅ Test email sent successfully!"
     except Exception as e:
         return f"❌ Failed to send email: {e}"
-
 
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0", port=8000)

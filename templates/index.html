@@ -82,6 +82,19 @@
         button.submit-btn:hover {
             background: #333;
         }
+        .contact-info {
+            margin-top: 30px;
+            font-size: 14px;
+            color: #333;
+        }
+        .contact-info a {
+            color: #007BFF;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
         @media (max-width: 600px) {
             .date-line, .duration-line {
                 flex-direction: column;
@@ -111,6 +124,9 @@
             <label>Email Address:</label>
             <input type="email" name="email" required>
 
+            <label>Phone Number (Optional):</label>
+            <input type="text" name="phone" placeholder="e.g. (302) 555-1234">
+
             <div class="red-label">Choose Payment Option:</div>
             <select name="payment_option" id="payment_option" onchange="toggleSlider(this.value)">
                 <option value="full">Pay in Full ($3500)</option>
@@ -124,22 +140,22 @@
                     <em>You will know if your offer is accepted on the next page.</em>
                 </p>
                 <label>Offer Amount:</label>
-                <input type="range" name="price" id="price" min="999" max="3500" step="50" value="2500" oninput="updatePriceDisplay(this.value)">
+                <input type="range" name="price" id="price" min="10" max="3500" step="50" value="2500" oninput="updatePriceDisplay(this.value)">
                 <p class="price-display">Your Offer: <span id="price-display">$2500</span></p>
             </div>
 
             <button type="submit" class="submit-btn">Submit and Continue</button>
         </form>
+
+        <div class="contact-info">
+            Call/Text/WhatsApp us: <a href="tel:+13027306085">(302) 730-6085</a>
+        </div>
     </div>
 
     <script>
         function toggleSlider(value) {
             const slider = document.getElementById('slider-box');
-            if (value === 'installments') {
-                slider.style.display = 'block';
-            } else {
-                slider.style.display = 'none';
-            }
+            slider.style.display = value === 'installments' ? 'block' : 'none';
         }
 
         function updatePriceDisplay(value) {
