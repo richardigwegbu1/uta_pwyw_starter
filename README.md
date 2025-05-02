@@ -1,6 +1,7 @@
 📖 UTA PWYW App
 
 Welcome to the official repository for the Unix Training Academy (UTA) Pay-What-You-Want (PWYW) Training Enrollment App! 🚀
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/richardigwegbu1/uta_pwyw_starter?label=Latest%20Release&style=for-the-badge)
 
 This application allows students to submit a form, choose their payment option, complete Stripe checkout, and automatically log their enrollment into Google Sheets — all securely managed with a simple and modern Python Flask backend.
 🌟 Features
